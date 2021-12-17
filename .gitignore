@@ -1,2 +1,13 @@
 .idea/
 *.iml
+
+
+.terraform
+test/stages/module
+*.tfstate
+*.tfstate.backup
+.kube
+bin2
+.terraform.lock.hcl
+
+.vscode
