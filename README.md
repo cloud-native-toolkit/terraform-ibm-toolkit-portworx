@@ -30,19 +30,19 @@ The module depends on the following software components:
 
 ### Command-line tools
 
-- terraform - v12
+- terraform - v15
 - kubectl
 
 ### Terraform providers
 
-- IBM Cloud provider >= 1.5.3
-- Helm provider >= 1.1.1 (provided by Terraform)
+- IBM Cloud provider >= 1.22.0
 
 ## Module dependencies
 
 This module makes use of the output from other modules:
 
-- Cluster - github.com/ibm-garage-cloud/terraform-ibm-container-platform.git
+- Cluster - https://github.com/ibm-garage-cloud/terraform-ibm-container-platform
+- Resource Group - https://github.com/cloud-native-toolkit/terraform-ibm-resource-group
 
 ## Example usage
 

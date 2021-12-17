@@ -1,6 +1,6 @@
 name: "ibm-portworx"
 type: terraform
-description: ""
+description: "Terraform module to install Portworx storage in an OpenShift cluster."
 tags:
     - tools
     - devops

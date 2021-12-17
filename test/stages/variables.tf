@@ -44,8 +44,8 @@ variable "subnets" {
   default = 1
 }
 
-variable "create_external_etcds" {
+variable "create_external_etcd" {
   type = bool
-  value = true
+  default = true
 }
  
