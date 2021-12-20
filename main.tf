@@ -199,6 +199,7 @@ resource "ibm_resource_instance" "portworx" {
   depends_on = [
     null_resource.volume_attachment,
     null_resource.portworx_secret,
+    module.clis
   ]
 
   count = var.provision ? 1 : 0
