@@ -1,25 +1,16 @@
 #!/bin/sh
 
-# VPC_REGION=us-east
-
-# export IAM_TOKEN=$(ibmcloud iam oauth-tokens --output json | jq -r '.iam_token')
-# export RESOURCE_GROUP=$(ibmcloud target --output json | jq -r '.resource_group.guid')
-# export CLUSTER="${1}"
-export UNIQUE_ID="pwx" # Obtained from main.tf in terraform/cp4data
-# ibmcloud target -r $VPC_REGION
+export CLUSTER="${1}"
+export UNIQUE_ID="pwx" 
 
 usage()
 {
-    echo "usage: " `basename $0` "[-h] -r REGION -c CLUSTER"
+    echo "usage: " `basename $0` "[-h] CLUSTER"
     echo
     echo "Run remove volume attachment script."
     echo
     echo "arguments:"
     echo "  -h, --help            show this help message and exit"
-    echo "  -r REGION, --region REGION"
-    echo "                        Region the resources are located"
-    echo "  -c CLUSTER, --cluster CLUSTER"
-    echo "                        Cluster name"
     exit 1
 }
 
@@ -28,23 +19,7 @@ if [ -z "$1" ]
     usage
 fi
 
-while [ "$1" != "" ]; do
-    case $1 in
-        -r | --region )         shift
-                                  VPC_REGION=$1
-                                  ;;
-        -c | --cluster )        shift
-                                  CLUSTER=$1
-                                  ;;                  
-        -h | --help )             usage
-                                  ;;
-        * )                       usage
-                                  ;;
-    esac
-    shift
-done
 
-ibmcloud target -r $VPC_REGION
 
 echo "Removing attachment from worker-node"
 for worker_node_id in `ibmcloud oc workers  --cluster $CLUSTER |grep '^kube' | cut -d ' ' -f 1` ; do 
