@@ -45,6 +45,3 @@ else
   echo "Attachment already exists: $RESPONSE"
 fi
 
-
-echo "sleeping for 2 mins to prevent synchronization errors"
-sleep 2m
