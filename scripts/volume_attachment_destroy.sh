@@ -1,7 +1,8 @@
 #!/bin/bash
 
 ibmcloud api cloud.ibm.com
-ibmcloud login -q --apikey ${IBMCLOUD_API_KEY} -r $REGION
+ibmcloud login -q --apikey ${IBMCLOUD_API_KEY}
+ibmcloud target -r $REGION
 export TOKEN=$(ibmcloud iam oauth-tokens --output json | jq -r '.iam_token')
 
 echo "Detaching volume $VOLUME_ID from worker $WORKER_ID"
