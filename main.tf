@@ -148,25 +148,40 @@ locals {
                                 null)
 }
 
-provider "kubernetes" {
-  config_path = module.cluster.config_file_path
-}
-
-resource "kubernetes_secret" "etcd" {
+resource "null_resource" "portworx_secret" {
   count = var.provision && var.create_external_etcd ? 1 : 0
+
+  depends_on = [
+    ibm_database.etcd
+  ]
   
-  metadata {
-    name = var.etcd_secret_name
-    namespace = "kube-system"
+  triggers = {
+      config_path      = module.cluster.config_file_path   
+      etcd_secret_name = var.etcd_secret_name   
   }
 
-  data = {
-    "ca.pem" = base64decode(local.etcd_user_connectionstring.certbase64)
-    username = var.etcd_username
-    password = var.etcd_password
+  provisioner "local-exec" {
+    environment = {
+      KUBECONFIG    = self.triggers.config_path
+    }
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl create secret generic ${self.triggers.etcd_secret_name} --from-literal=username='${var.etcd_username}' --from-literal=password='${var.etcd_password}' --from-literal=ca.pem='${base64decode(local.etcd_user_connectionstring.certbase64)}' -n kube-system"
   }
   
+  provisioner "local-exec" {
+    when = destroy
+    environment = {
+      KUBECONFIG    = self.triggers.config_path
+    }
+  
+    interpreter = ["/bin/bash", "-c"]
+    command     = "kubectl delete secret generic ${self.triggers.etcd_secret_name} -n kube-system --ignore-not-found"
+  }
 }
+
+
+
+
 
 # ##################################
 # # Install Portworx on the cluster
@@ -183,7 +198,7 @@ module "clis" {
 resource "ibm_resource_instance" "portworx" {
   depends_on = [
     null_resource.volume_attachment,
-    kubernetes_secret.etcd,
+    null_resource.portworx_secret,
   ]
 
   count = var.provision ? 1 : 0
