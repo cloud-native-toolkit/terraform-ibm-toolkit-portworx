@@ -5,6 +5,9 @@ ibmcloud login -q --apikey ${IBMCLOUD_API_KEY}
 ibmcloud target -r $REGION
 export TOKEN=$(ibmcloud iam oauth-tokens --output json | jq -r '.iam_token')
 
+echo "sleeping for 2 mins to prevent synchronization errors"
+sleep 2m
+
 echo "Detaching volume $VOLUME_ID from worker $WORKER_ID"
 
 # Grab volume attachment id
