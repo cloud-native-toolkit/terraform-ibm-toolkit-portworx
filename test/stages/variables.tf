@@ -1,4 +1,3 @@
-
 # Resource Group Variables
 variable "resource_group_name" {
   type        = string
@@ -26,25 +25,27 @@ variable "cluster_name" {
   default     = ""
 }
 
-variable "cluster_type" {
-  type        = string
-  description = "The type of cluster that should be created (openshift or kubernetes)"
-}
-
-variable "cluster_exists" {
-  type        = string
-  description = "Flag indicating if the cluster already exists (true or false)"
-  default     = "true"
-}
-
 variable "name_prefix" {
   type        = string
   description = "Prefix name that should be used for the cluster and services. If not provided then resource_group_name will be used"
-  default     = ""
+  default     = "pwx-test"
 }
 
-variable "vpc_cluster" {
-  type        = bool
-  description = "Flag indicating that this is a vpc cluster"
-  default     = false
+
+variable "workers" {
+  type = number
+  description = "Number of worker nodes"
+  default = 4
 }
+
+variable "subnets" {
+  type = number
+  description = "Number of subnets"
+  default = 1
+}
+
+variable "create_external_etcd" {
+  type = bool
+  default = false
+}
+ 

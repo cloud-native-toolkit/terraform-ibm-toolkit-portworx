@@ -1,29 +1,28 @@
 # Starter kit for a Terraform module
 
-This is a Starter kit to help with the creation of Terraform modules. The basic structure of a Terraform module is fairly
-simple and consists of the following basic values:
+This is a Terraform module to install Portworx, a cloud-native persistent storage and data management solution for Kubernetes and OpenShift clusters, into a VPC cluster on IBM Cloud.
 
-- README.md - provides a description of the module
-- main.tf - defiens the logic for the module
-- variables.tf (optional) - defines the input variables for the module
-- outputs.tf (optional) - defines the values that are output from the module
+This module will:
 
-Beyond those files, any other content can be added and organized however you see fit. For example, you can add a `scripts/` directory
-that contains shell scripts executed by a `local-exec` `null_resource` in the terraform module. The contents will depend on what your
-module does and how it does it.
+1. Create a storage volume for each worker in the cluster
+2. Mount each volume to the workers
+3. Optionally create a managed etcd database instance for Portworx to use
+4. Install Portworx into the cluster
+5. Create StorageClass instances within the cluster to allow use of Portworx encrypted volumes
 
-## Instructions for creating a new module
+This module is derivative from the Portworx template at https://github.com/ibm-hcbt/terraform-ibm-cloud-pak/tree/main/modules/portworx
+It also leverages additional scripts from https://github.com/IBM/ibmcloud-storage-utilities/tree/master/px-utils
 
-1. Update the title and description in the README to match the module you are creating
-2. Fill out the remaining sections in the README template as appropriate
-3. Implement your logic in the in the main.tf, variables.tf, and outputs.tf
-4. Use releases/tags to manage release versions of your module
+Changes include:
 
-## Description
+- Compatibility with the modular approach used by [Cloud Native Toolkit Terraform modules](https://github.com/cloud-native-toolkit)
+- Support for the `terraform destroy` command. It will now completly remove Portworx and the associated volumes from the cluster
+- Suppport for dynamic volume creation based on VPC cluster workers
 
-Description of module
+Additional documentation on Portworx on IBM Cloud available at:
 
-**Note:** This module follows the Terraform conventions regarding how provider configuration is defined within the Terraform template and passed into the module - https://www.terraform.io/docs/language/modules/develop/providers.html. The default provider configuration flows through to the module. If different configuration is required for a module, it can be explicitly passed in the `providers` block of the module - https://www.terraform.io/docs/language/modules/develop/providers.html#passing-providers-explicitly.
+- https://docs.portworx.com/portworx-install-with-kubernetes/cloud/ibm/
+- https://cloud.ibm.com/docs/containers?topic=containers-portworx
 
 ## Software dependencies
 
@@ -31,35 +30,33 @@ The module depends on the following software components:
 
 ### Command-line tools
 
-- terraform - v12
+- terraform - v15
 - kubectl
 
 ### Terraform providers
 
-- IBM Cloud provider >= 1.5.3
-- Helm provider >= 1.1.1 (provided by Terraform)
+- IBM Cloud provider >= 1.22.0
 
 ## Module dependencies
 
 This module makes use of the output from other modules:
 
-- Cluster - github.com/ibm-garage-cloud/terraform-ibm-container-platform.git
-- Namespace - github.com/ibm-garage-clout/terraform-cluster-namespace.git
-- etc
+- Cluster - https://github.com/ibm-garage-cloud/terraform-ibm-container-platform
+- Resource Group - https://github.com/cloud-native-toolkit/terraform-ibm-resource-group
 
 ## Example usage
 
 ```hcl-terraform
-module "dev_tools_argocd" {
-  source = "github.com/cloud-native-toolkit/terraform-tools-argocd.git"
-
-  cluster_config_file = module.dev_cluster.config_file_path
-  cluster_type        = module.dev_cluster.type
-  app_namespace       = module.dev_cluster_namespaces.tools_namespace_name
-  ingress_subdomain   = module.dev_cluster.ingress_hostname
-  olm_namespace       = module.dev_software_olm.olm_namespace
-  operator_namespace  = module.dev_software_olm.target_namespace
-  name                = "argocd"
+module "portworx_module" {
+  source = "github.com/cloud-native-toolkit/terraform-portworx.git"
+  resource_group_name = var.resource_group_name
+  region              = var.region
+  ibmcloud_api_key    = var.ibmcloud_api_key
+  cluster_name        = module.cluster.name
+  name_prefix         = var.name_prefix
+  workers             = module.cluster.workers
+  worker_count        = module.cluster.total_worker_count
+  create_external_etcd = var.create_external_etcds
 }
-```
 
+```
