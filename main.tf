@@ -148,6 +148,10 @@ locals {
                                 null)
 }
 
+provider "kubernetes" {
+  config_path = module.cluster.config_file_path
+}
+
 resource "kubernetes_secret" "etcd" {
   count = var.provision && var.create_external_etcd ? 1 : 0
   
