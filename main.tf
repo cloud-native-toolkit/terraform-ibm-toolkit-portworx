@@ -56,7 +56,8 @@ resource "null_resource" "print_volume_names" {
 resource "ibm_is_volume" "volume" {
   depends_on = [
     data.ibm_is_subnet.subnets,
-    null_resource.print_volume_names
+    null_resource.print_volume_names,
+    null_resource.portworx_cleanup_helper
   ]
   count = var.install_storage ? var.worker_count : 0
 
@@ -214,7 +215,8 @@ resource "ibm_resource_instance" "portworx" {
   depends_on = [
     null_resource.volume_attachment,
     null_resource.portworx_secret,
-    module.clis
+    module.clis,
+    null_resource.portworx_cleanup_helper
   ]
 
   count = var.provision ? 1 : 0
@@ -253,12 +255,48 @@ resource "ibm_resource_instance" "portworx" {
     command     = file("${path.module}/scripts/portworx_wait_until_ready.sh")
   }
 
+  # provisioner "local-exec" {
+  #   when = destroy
+  #   environment = {
+  #     CLUSTER    = self.parameters.cluster_name
+  #     KUBECONFIG = self.parameters.config_path
+  #     BIN_DIR    = self.parameters.bin_dir
+  #   }
+
+  #   interpreter = ["/bin/bash", "-c"]
+  #   command     = file("${path.module}/scripts/wipe_portworx.sh")
+  # }
+}
+
+
+
+resource "null_resource" "portworx_cleanup_helper" {
+  count = var.provision && var.create_external_etcd ? 1 : 0
+
+  # depends_on = [
+  #   ibm_resource_instance.portworx
+  # ]
+
+  triggers = {
+    cluster_name = module.cluster.name
+    config_path  = module.cluster.config_file_path
+    bin_dir      = module.clis.bin_dir
+  }
+
+  provisioner "local-exec" {
+    environment = {
+      KUBECONFIG = self.triggers.config_path
+    }
+    interpreter = ["/bin/bash", "-c"]
+    command     = "echo \"cleanup helper ready\""
+  }
+
   provisioner "local-exec" {
     when = destroy
     environment = {
-      CLUSTER    = self.parameters.cluster_name
-      KUBECONFIG = self.parameters.config_path
-      BIN_DIR    = self.parameters.bin_dir
+      CLUSTER    = self.triggers.cluster_name
+      KUBECONFIG = self.triggers.config_path
+      BIN_DIR    = self.triggers.bin_dir
     }
 
     interpreter = ["/bin/bash", "-c"]

@@ -50,7 +50,7 @@ else
   helm uninstall portworx || _rc=$?
   if [ $_rc -ne 0 ]; then
     echo "error removing the helm release"
-    exit 1;
+    #exit 1;
   fi
 fi
 
@@ -70,7 +70,8 @@ kubectl delete Service portworx-service -n kube-system --ignore-not-found=true
 kubectl delete Service portworx-api -n kube-system --ignore-not-found=true
 
 kubectl delete serviceaccount -n kube-system portworx-hook --ignore-not-found=true 
-kubectl delete clusterrole portworx-hook --ignore-not-found=true
+kubectl delete clusterrole portworx-hook -n kube-system --ignore-not-found=true
+kubectl delete clusterrolebinding portworx-hook -n kube-system --ignore-not-found=true
 
 kubectl delete job -n kube-system talisman --ignore-not-found=true
 kubectl delete serviceaccount -n kube-system talisman-account --ignore-not-found=true 
