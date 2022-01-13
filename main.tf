@@ -271,7 +271,7 @@ resource "ibm_resource_instance" "portworx" {
 
 
 resource "null_resource" "portworx_cleanup_helper" {
-  count = var.provision && var.create_external_etcd ? 1 : 0
+  count = var.provision ? 1 : 0
 
   # depends_on = [
   #   ibm_resource_instance.portworx
@@ -284,9 +284,6 @@ resource "null_resource" "portworx_cleanup_helper" {
   }
 
   provisioner "local-exec" {
-    environment = {
-      KUBECONFIG = self.triggers.config_path
-    }
     interpreter = ["/bin/bash", "-c"]
     command     = "echo \"cleanup helper ready\""
   }
