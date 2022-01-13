@@ -31,6 +31,19 @@ while read in; do
 done < sc.tmp
 rm -rf sc.tmp
 
+echo "removing portworx artifacts"
+kubectl delete serviceaccount -n kube-system portworx-hook --ignore-not-found=true
+kubectl delete clusterrole -n kube-system portworx-hook --ignore-not-found=true
+kubectl delete clusterrolebinding -n kube-system portworx-hook --ignore-not-found=true
+
+kubectl delete Service portworx-service -n kube-system --ignore-not-found=true
+kubectl delete Service portworx-api -n kube-system --ignore-not-found=true
+
+kubectl delete job -n kube-system talisman --ignore-not-found=true
+kubectl delete serviceaccount -n kube-system talisman-account --ignore-not-found=true 
+kubectl delete clusterrolebinding talisman-role-binding --ignore-not-found=true 
+kubectl delete crd volumeplacementstrategies.portworx.io --ignore-not-found=true
+kubectl delete configmap -n kube-system portworx-pvc-controller --ignore-not-found=true
 
 # use the following command to verify all portworks resources are gone.  If you see a result here, it didn't work
 # kubectl get all -A | grep portworx
