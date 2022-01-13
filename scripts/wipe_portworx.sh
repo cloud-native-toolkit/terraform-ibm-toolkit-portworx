@@ -45,5 +45,7 @@ kubectl delete clusterrolebinding talisman-role-binding --ignore-not-found=true
 kubectl delete crd volumeplacementstrategies.portworx.io --ignore-not-found=true
 kubectl delete configmap -n kube-system portworx-pvc-controller --ignore-not-found=true
 
+kubectl delete secret -n default sh.helm.release.v1.portworx.v1 --ignore-not-found=true
+
 # use the following command to verify all portworks resources are gone.  If you see a result here, it didn't work
 # kubectl get all -A | grep portworx
