@@ -42,10 +42,21 @@ data "ibm_is_subnet" "subnets" {
   #todo: zone should be renamed to subnet once cluster module is updated
 }
 
+resource "null_resource" "print_volume_names" {
+  depends_on = [
+    data.ibm_is_subnet.subnets
+  ]
+  count = var.install_storage ? var.worker_count : 0
+  provisioner "local-exec" {
+    command = "echo 'Creating volume: ${substr("${replace(var.name_prefix, "_", "-")}${length(var.name_prefix) > 0 ? "-" : ""}pwx-${count.index}-${var.workers[count.index].id}", 0, 61)}'"
+  }
+}
+
 # Create a block storage volume per worker.
 resource "ibm_is_volume" "volume" {
   depends_on = [
-    data.ibm_is_subnet.subnets
+    data.ibm_is_subnet.subnets,
+    null_resource.print_volume_names
   ]
   count = var.install_storage ? var.worker_count : 0
 
