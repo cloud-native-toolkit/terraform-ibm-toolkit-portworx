@@ -32,10 +32,10 @@ variable "name_prefix" {
 }
 
 
-variable "workers" {
+variable "worker_count" {
   type = number
   description = "Number of worker nodes"
-  default = 4
+  default = 3
 }
 
 variable "subnets" {
