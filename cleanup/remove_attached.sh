@@ -69,9 +69,13 @@ kubectl delete clusterrolebinding -n kube-system portworx-hook --ignore-not-foun
 kubectl delete Service portworx-service -n kube-system --ignore-not-found=true
 kubectl delete Service portworx-api -n kube-system --ignore-not-found=true
 
+kubectl delete serviceaccount -n kube-system portworx-hook --ignore-not-found=true 
+kubectl delete clusterrole portworx-hook --ignore-not-found=true
+
 kubectl delete job -n kube-system talisman --ignore-not-found=true
 kubectl delete serviceaccount -n kube-system talisman-account --ignore-not-found=true 
 kubectl delete clusterrolebinding talisman-role-binding --ignore-not-found=true 
 kubectl delete crd volumeplacementstrategies.portworx.io --ignore-not-found=true
 kubectl delete configmap -n kube-system portworx-pvc-controller --ignore-not-found=true
+
 kubectl delete secret -n default sh.helm.release.v1.portworx.v1 --ignore-not-found=true
