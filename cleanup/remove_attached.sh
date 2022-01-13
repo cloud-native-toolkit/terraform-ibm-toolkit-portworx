@@ -24,7 +24,12 @@ fi
 echo "Removing attachment from worker-node"
 for worker_node_id in `ibmcloud oc workers  --cluster $CLUSTER |grep '^kube' | cut -d ' ' -f 1` ; do 
 
+    echo "worker: $worker_node_id"
     attachment_id=`ibmcloud ks storage attachments -c $CLUSTER -w ${worker_node_id} | grep ${UNIQUE_ID} | cut -d ' ' -f 1`
-    ibmcloud ks storage attachment rm -c $CLUSTER -w ${worker_node_id} --attachment ${attachment_id}
+    if [ -n "$attachment_id" ]; then 
+        ibmcloud ks storage attachment rm -c $CLUSTER -w ${worker_node_id} --attachment ${attachment_id}
+    else
+        echo "not found"
+    fi 
 
 done
