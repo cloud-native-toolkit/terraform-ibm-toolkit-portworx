@@ -48,7 +48,7 @@ resource "null_resource" "print_volume_names" {
   ]
   count = var.install_storage ? var.worker_count : 0
   provisioner "local-exec" {
-    command = "echo 'Creating volume: ${substr("${replace(var.name_prefix, "_", "-")}${length(var.name_prefix) > 0 ? "-" : ""}pwx-${count.index}-${var.workers[count.index].id}", 0, 61)}'"
+    command = "echo 'Creating volume: ${substr("${replace(var.name_prefix, "_", "-")}${length(var.name_prefix) > 0 ? "-" : ""}${count.index}-pwx-${var.workers[count.index].id}", 0, 61)}'"
   }
 }
 
@@ -62,7 +62,7 @@ resource "ibm_is_volume" "volume" {
 
   capacity       = var.storage_capacity
   iops           = var.storage_profile == "custom" ? var.storage_iops : null
-  name           = substr("${replace(var.name_prefix, "_", "-")}${length(var.name_prefix) > 0 ? "-" : ""}pwx-${count.index}-${var.workers[count.index].id}", 0, 61) #max length of 61 characters for volume name
+  name           = substr("${replace(var.name_prefix, "_", "-")}${length(var.name_prefix) > 0 ? "-" : ""}${count.index}-pwx-${var.workers[count.index].id}", 0, 61) #max length of 61 characters for volume name
   profile        = var.storage_profile
   resource_group = module.resource_group.id
   zone           = data.ibm_is_subnet.subnets[count.index].zone
