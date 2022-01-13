@@ -5,7 +5,7 @@ echo 'Sleeping 2m...'
 sleep 2m
 
 SLEEP_TIME="15s"
-LIMIT=200
+LIMIT=100
 
 
 # Check if pods are ready

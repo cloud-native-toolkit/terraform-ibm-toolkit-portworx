@@ -1,10 +1,10 @@
 #!/bin/bash
 
-ibmcloud api cloud.ibm.com
-ibmcloud login -q --no-region
-ibmcloud target -r $REGION
+JQ="$BIN_DIR/jq"
 
-export TOKEN=$(ibmcloud iam oauth-tokens --output json | jq -r '.iam_token')
+export TOKEN=$(curl -s -X POST "https://iam.cloud.ibm.com/identity/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=${IBMCLOUD_API_KEY}" | ${JQ} -r '.access_token')
 
 # Before creating, check to see if attachment for volume is already present
 if ! RESPONSE=$(curl -s -X GET \
