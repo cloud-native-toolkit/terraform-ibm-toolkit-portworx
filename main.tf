@@ -258,7 +258,8 @@ resource "ibm_resource_instance" "portworx" {
 
 
 # This cleanup script will execute **after** the resources have been reclaimed b/c 
-the volumes and portworx resource instance depend on it.
+# the volumes and portworx resource instance depend on it.  At apply-time it doesn't do anything.
+# At destroy-time it will cleanup Portworx artifacts left in the kube cluster.
 resource "null_resource" "portworx_cleanup_helper" {
   count = var.provision ? 1 : 0
 
