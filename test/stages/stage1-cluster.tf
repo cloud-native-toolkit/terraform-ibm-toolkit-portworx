@@ -5,7 +5,7 @@ module "cluster" {
   region              = var.region
   ibmcloud_api_key    = var.ibmcloud_api_key
   name                = var.cluster_name
-  worker_count        = var.workers
+  worker_count        = var.worker_count
   name_prefix         = var.name_prefix
   exists              = true
   cos_id              = ""
@@ -15,7 +15,7 @@ module "cluster" {
 }
 
 
-resource null_resource print_resources {
+resource "null_resource" "print_resources" {
   triggers = {
     always_run = timestamp()
   }

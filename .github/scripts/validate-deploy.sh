@@ -1,8 +1,9 @@
 #!/bin/bash
 
-echo "no validation"
+echo "sleeping for 5 mins to prevent synchronization errors"
+sleep 5m
 
+echo "checking for portworx services"
 
-
-echo "sleeping for 4 mins to prevent synchronization errors"
-sleep 4m
+#kubectl get service portworx-service -A
+#kubectl get service portworx-api -A
