@@ -254,28 +254,13 @@ resource "ibm_resource_instance" "portworx" {
     interpreter = ["/bin/bash", "-c"]
     command     = file("${path.module}/scripts/portworx_wait_until_ready.sh")
   }
-
-  # provisioner "local-exec" {
-  #   when = destroy
-  #   environment = {
-  #     CLUSTER    = self.parameters.cluster_name
-  #     KUBECONFIG = self.parameters.config_path
-  #     BIN_DIR    = self.parameters.bin_dir
-  #   }
-
-  #   interpreter = ["/bin/bash", "-c"]
-  #   command     = file("${path.module}/scripts/wipe_portworx.sh")
-  # }
 }
 
 
-
+# This cleanup script will execute **after** the resources have been reclaimed b/c 
+the volumes and portworx resource instance depend on it.
 resource "null_resource" "portworx_cleanup_helper" {
   count = var.provision ? 1 : 0
-
-  # depends_on = [
-  #   ibm_resource_instance.portworx
-  # ]
 
   triggers = {
     cluster_name = module.cluster.name
