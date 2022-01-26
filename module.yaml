@@ -28,6 +28,10 @@ versions:
      moduleRef:
        id: cluster
        output: workers
+   - name: worker_count
+     moduleRef:
+       id: cluster
+       output: total_worker_count
    - name: resource_group_name
      moduleRef:
        id: resource_group
