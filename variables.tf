@@ -107,11 +107,17 @@ variable "etcd_service_endpoints" {
 # You may override these for additional security.
 variable "etcd_username" {
   default = "portworxuser"
+  type = string
+  description = "etcd_username: You may override for additional security."
 }
 variable "etcd_password" {
   default = "etcdpassword123"
+  type = string
+  description = "etcd_password: You may override for additional security."
 }
 variable "etcd_secret_name" {
   default = "px-etcd-certs" # don't change this
+  type = string
+  description = "etcd_secret_name: This should not be changed unless you know what you're doing."
 }
 
