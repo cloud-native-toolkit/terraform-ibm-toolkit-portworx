@@ -7,11 +7,6 @@ variable "ibmcloud_api_key" {
   description = "Get the ibmcloud api key from https://cloud.ibm.com/iam/apikeys"
 }
 
-variable "install_storage" {
-    default     = true
-    description = "If set to false does not install storage and attach the volumes to the worker nodes. Enabled by default"
-}
-
 variable "cluster_name" {
   type        = string
   description = "The name of the cluster"

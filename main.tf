@@ -13,6 +13,7 @@ resource "null_resource" "print_resources" {
 }
 
 module "resource_group" {
+  depends_on = [null_resource.print_resources]
   source = "github.com/cloud-native-toolkit/terraform-ibm-resource-group.git"
 
   resource_group_name = var.resource_group_name
@@ -20,6 +21,7 @@ module "resource_group" {
 }
 
 module "cluster" {
+  depends_on = [null_resource.print_resources]
   source = "github.com/cloud-native-toolkit/terraform-ibm-ocp-vpc.git?ref=v1.10.2"
 
   resource_group_name = var.resource_group_name
@@ -37,6 +39,7 @@ module "cluster" {
 
 
 data "ibm_is_subnet" "subnets" {
+  depends_on = [module.cluster]
   count      = var.worker_count
   identifier = var.workers[count.index].zone
   #todo: zone should be renamed to subnet once cluster module is updated
@@ -46,7 +49,7 @@ resource "null_resource" "print_volume_names" {
   depends_on = [
     data.ibm_is_subnet.subnets
   ]
-  count = var.install_storage ? var.worker_count : 0
+  count = var.provision ? var.worker_count : 0
   provisioner "local-exec" {
     command = "echo 'Creating volume: ${substr("${replace(var.name_prefix, "_", "-")}${length(var.name_prefix) > 0 ? "-" : ""}${count.index}-pwx-${var.workers[count.index].id}", 0, 61)}'"
   }
@@ -59,7 +62,7 @@ resource "ibm_is_volume" "volume" {
     null_resource.print_volume_names,
     null_resource.portworx_cleanup_helper
   ]
-  count = var.install_storage ? var.worker_count : 0
+  count = var.provision ? var.worker_count : 0
 
   capacity       = var.storage_capacity
   iops           = var.storage_profile == "custom" ? var.storage_iops : null
@@ -73,7 +76,7 @@ resource "ibm_is_volume" "volume" {
 
 
 data "ibm_container_vpc_cluster_worker" "workers" {
-  count = var.install_storage ? var.worker_count : 0
+  count = var.provision ? var.worker_count : 0
 
   cluster_name_id   = module.cluster.id
   resource_group_id = module.resource_group.id
@@ -86,7 +89,7 @@ locals {
 
 # Attach block storage to worker
 resource "null_resource" "volume_attachment" {
-  count = var.install_storage ? var.worker_count : 0
+  count = var.provision ? var.worker_count : 0
 
   depends_on = [
     ibm_is_volume.volume,
