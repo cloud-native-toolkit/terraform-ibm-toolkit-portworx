@@ -111,7 +111,8 @@ variable "etcd_password" {
   description = "etcd_password: You may override for additional security."
 }
 variable "etcd_secret_name" {
-  default = "px-etcd-certs" # don't change this
+  # don't change this
+  default = "px-etcd-certs"
   type = string
   description = "etcd_secret_name: This should not be changed unless you know what you're doing."
 }
