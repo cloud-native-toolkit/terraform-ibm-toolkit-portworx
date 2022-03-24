@@ -123,6 +123,8 @@ versions:
       - name: etcd_secret_name
         type: string
         description: 'etcd_secret_name: This should not be changed unless you know what you''re doing.'
+        default: px-etcd-certs
+        optional: true
     version: v1.0.4
   - platforms:
       - ocp4
@@ -243,6 +245,8 @@ versions:
         optional: true
       - name: etcd_secret_name
         type: string
+        default: px-etcd-certs
+        optional: true
     version: v1.0.3
   - platforms:
       - ocp4
@@ -363,6 +367,8 @@ versions:
         optional: true
       - name: etcd_secret_name
         type: string
+        default: px-etcd-certs
+        optional: true
     version: v1.0.2
   - platforms:
       - ocp4
@@ -480,6 +486,8 @@ versions:
         optional: true
       - name: etcd_secret_name
         type: string
+        default: px-etcd-certs
+        optional: true
     version: v1.0.1
   - platforms:
       - ocp4
@@ -597,4 +605,6 @@ versions:
         optional: true
       - name: etcd_secret_name
         type: string
+        default: px-etcd-certs
+        optional: true
     version: v1.0.0
