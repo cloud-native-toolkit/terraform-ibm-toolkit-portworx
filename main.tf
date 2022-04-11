@@ -12,12 +12,10 @@ resource "null_resource" "print_resources" {
   }
 }
 
-module "resource_group" {
+data ibm_resource_group resource_group {
   depends_on = [null_resource.print_resources]
-  source = "github.com/cloud-native-toolkit/terraform-ibm-resource-group.git"
 
-  resource_group_name = var.resource_group_name
-  provision           = false
+  name  = var.resource_group_name
 }
 
 module "cluster" {
@@ -68,7 +66,7 @@ resource "ibm_is_volume" "volume" {
   iops           = var.storage_profile == "custom" ? var.storage_iops : null
   name           = substr("${replace(var.name_prefix, "_", "-")}${length(var.name_prefix) > 0 ? "-" : ""}${count.index}-pwx-${var.workers[count.index].id}", 0, 61) #max length of 61 characters for volume name
   profile        = var.storage_profile
-  resource_group = module.resource_group.id
+  resource_group = data.ibm_resource_group.resource_group.id
   zone           = data.ibm_is_subnet.subnets[count.index].zone
   #todo: zone should be renamed to subnet
 }
@@ -79,7 +77,7 @@ data "ibm_container_vpc_cluster_worker" "workers" {
   count = var.provision ? var.worker_count : 0
 
   cluster_name_id   = module.cluster.id
-  resource_group_id = module.resource_group.id
+  resource_group_id = data.ibm_resource_group.resource_group.id
   worker_id         = var.workers[count.index].id
 }
 
@@ -99,7 +97,7 @@ resource "null_resource" "volume_attachment" {
   triggers = {
     IBMCLOUD_API_KEY  = base64encode(var.ibmcloud_api_key)
     REGION            = var.region
-    RESOURCE_GROUP_ID = module.resource_group.id
+    RESOURCE_GROUP_ID = data.ibm_resource_group.resource_group.id
     CLUSTER_ID        = module.cluster.id
     WORKER_ID         = length(data.ibm_container_vpc_cluster_worker.workers) > 0 ? data.ibm_container_vpc_cluster_worker.workers[count.index].id : 0
     VOLUME_ID         = length(ibm_is_volume.volume) > 0 ? ibm_is_volume.volume[count.index].id : 0
@@ -149,7 +147,7 @@ resource "ibm_database" "etcd" {
   members_memory_allocation_mb = var.etcd_members_memory_allocation_mb
   name                         = "${var.name_prefix}-pwx-etcd"
   plan                         = var.etcd_plan
-  resource_group_id            = module.resource_group.id
+  resource_group_id            = data.ibm_resource_group.resource_group.id
   service                      = "databases-for-etcd"
   service_endpoints            = var.etcd_service_endpoints
   version                      = var.etcd_version
@@ -228,7 +226,7 @@ resource "ibm_resource_instance" "portworx" {
   service           = "portworx"
   plan              = "px-enterprise"
   location          = var.region
-  resource_group_id = module.resource_group.id
+  resource_group_id = data.ibm_resource_group.resource_group.id
 
   tags = [
     "clusterid:${module.cluster.id}",
