@@ -46,6 +46,8 @@ This module makes use of the output from other modules:
 
 ## Example usage
 
+[Refer test cases for more details](scripts/px-sc.sh)
+
 ```hcl-terraform
 module "portworx_module" {
   source = "github.com/cloud-native-toolkit/terraform-portworx.git"
